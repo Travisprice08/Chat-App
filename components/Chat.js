@@ -36,6 +36,7 @@ export default class Chat extends Component {
         //Get name from home screen and apply it as the title
         const name = this.props.route.params.name;
         this.props.navigation.setOptions({ title: name });
+        //sends a static message
         this.setState({
             messages: [
                 {
@@ -57,7 +58,7 @@ export default class Chat extends Component {
             ],
         })
     }
-
+    // Attach new message to message status object when user presses send
     onSend(messages = []) {
         this.setState(previousState => ({
             messages: GiftedChat.append(previousState.messages, messages),
@@ -78,6 +79,7 @@ export default class Chat extends Component {
     }
 
     render() {
+        // Get name and background color that user selected
         let { backgroundColor } = this.props.route.params;
         return (
             <View style={{
@@ -88,6 +90,7 @@ export default class Chat extends Component {
             }}>
                 <Text style={styles.welcome}>Hello, {this.props.route.params.name}!</Text>
                 <GiftedChat
+                    // Change color of chat bubble
                     // renderBubble={this.renderBubble.bind(this)}
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
