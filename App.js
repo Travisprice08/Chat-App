@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Alert, ScrollView } from 'react-native';
-import Start from './components/Chat';
-import Chat from './components/Start';
+import Start from './components/Start';
+import Chat from './components/Chat';
 import 'react-native-gesture-handler';
 
 import { NavigationContainer } from '@react-navigation/native';

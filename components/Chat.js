@@ -1,190 +1,113 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
+import { GiftedChat } from 'react-native-gifted-chat';
 import {
     View,
     Text,
-    TextInput,
-    Button,
     StyleSheet,
-    Pressable,
-    ImageBackground,
-    Image,
+    Platform,
+    KeyboardAvoidingView,
     TouchableOpacity,
+    Alert,
+    LogBox,
 } from 'react-native';
 
-export default class Start extends Component {
+
+export default class Chat extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: "",
-            bgColor: "black",
-            border: 0,
+            isTyping: false,
+            messages: [],
+            uid: 0,
+            loginText: "Loading..",
+            user: {
+                _id: "",
+                name: "",
+                avatar: "",
+            },
+            isConnected: false,
+            dotColor: "",
+            image: null,
+            location: null,
         };
     }
-    render() {
-        return (
-            <ImageBackground
-                style={styles.imgBackground}
-                resizeMode="cover"
-                source={require("../assets/startImg.png")}
-            >
-                {/* Main view defined */}
-                <View style={styles.mainContainer}>
-                    <Text style={styles.title}>Chat App</Text>
-                    {/* <Button
-                        title="Go to Screen 2"
-                        onPress={() => this.props.navigation.navigate('Screen2')}
-                    /> */}
-                </View>
 
-                {/*Container for text input and background color selector*/}
-                <View style={styles.container}>
-                    <View style={styles.textInputCont}>
-                        <TextInput style={[styles.textInput,
-                        {
-                            backgroundColor: this.state.backgroundColor,
-                        },
-                        ]}
-                            onChangeText={(name) => this.setState({ name })}
-                            value={this.state.name}
-                            palceholder="Your name"
-                            placeholderTextColor="rgba(255, 255, 255, 1)"
-                        />
-                    </View>
-                    <View style={styles.colorSelectorCont}>
-                        <Text style={styles.selectColor}>Select a Color:</Text>
-                        <View style={styles.colorSelector}>
-                            {/* Selecting color */}
-                            <TouchableOpacity
-                                accessible={true}
-                                accessibilityLabel="Black Color"
-                                accessibilityHint="Allows you to choose black as contrast color in chat."
-                                style={[
-                                    styles.colors,
-                                    styles.black,
-                                    { borderWidth: this.state.border },
-                                ]}
-                                onPress={() => this.setState({ backgroundColor: "#212121" })}
-                            ></TouchableOpacity>
-                            <TouchableOpacity
-                                accessible={true}
-                                accessibilityLabel="Blue Color"
-                                accessibilityHint="Allows you to choose blue as contrast color in chat."
-                                style={[
-                                    styles.colors,
-                                    styles.blue,
-                                    { borderWidth: this.state.border },
-                                ]}
-                                onPress={() => this.setState({ backgroundColor: "#3D56B2" })}
-                            ></TouchableOpacity>
-                            <TouchableOpacity
-                                accessible={true}
-                                accessibilityLabel="Red Color"
-                                accessibilityHint="Allows you to choose red as contrast color in chat."
-                                style={[
-                                    styles.colors,
-                                    styles.red,
-                                    { borderWidth: this.state.border },
-                                ]}
-                                onPress={() => this.setState({ backgroundColor: "#FF0000" })}
-                            ></TouchableOpacity>
-                            <TouchableOpacity
-                                accessible={true}
-                                accessibilityLabel="Purple Color"
-                                accessibilityHint="Allows you to choose purple as contrast color in chat."
-                                style={[
-                                    styles.colors,
-                                    styles.purple,
-                                    { borderWidth: this.state.border },
-                                ]}
-                                onPress={() => this.setState({ backgroundColor: "#610094" })}
-                            ></TouchableOpacity>
-                        </View>
-                    </View>
-                    {/* Button to enter chatroom */}
-                    <View>
-                        <TouchableOpacity
-                            style={[
-                                styles.enterChat,
-                                { backgroundColor: this.state.backgroundColor },
-                            ]}
-                            onPress={() =>
-                                this.props.navigation.navigate("Chat", {
-                                    name: this.state.name,
-                                    backgroundColor: this.state.backgroundColor,
-                                })
-                            }
-                        >
-                            <Text style={styles.btnText}>Enter Chatroom</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </ImageBackground>
-        );
+    componentDidMount() {
+        //Get name from home screen and apply it as the title
+        const name = this.props.route.params.name;
+        this.props.navigation.setOptions({ title: name });
+        this.setState({
+            messages: [
+                {
+                    _id: 1,
+                    text: `Hello, ${name}!`,
+                    createdAt: new Date(),
+                    user: {
+                        _id: 2,
+                        name: 'React Native',
+                        avatar: 'https://placeimg.com/140/140/any',
+                    },
+                },
+                {
+                    _id: 2,
+                    text: `${name} has entered the chat`,
+                    createdAt: new Date(),
+                    system: true,
+                },
+            ],
+        })
+    }
+
+    onSend(messages = []) {
+        this.setState(previousState => ({
+            messages: GiftedChat.append(previousState.messages, messages),
+        }));
+    }
+
+    renderBubble(props) {
+        return (
+            <Bubble
+                {...props}
+                wrapperStyle={{
+                    right: {
+                        backgroundColor: '#000'
+                    }
+                }}
+            />
+        )
+    }
+
+    render() {
+        let { backgroundColor } = this.props.route.params;
+        return (
+            <View style={{
+                flex: 1,
+                // justify: "center",
+                // alignItems: "center",
+                backgroundColor: this.props.route.params.backgroundColor
+            }}>
+                <Text style={styles.welcome}>Hello, {this.props.route.params.name}!</Text>
+                <GiftedChat
+                    // renderBubble={this.renderBubble.bind(this)}
+                    messages={this.state.messages}
+                    onSend={messages => this.onSend(messages)}
+                    user={{
+                        _id: 1,
+                    }}
+                />
+                {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
+                }
+            </View>
+        )
     }
 }
 
 const styles = StyleSheet.create({
-    // backgroundColor: {
 
-    // },
-    container: {
-        width: "88%",
-        height: 320,
-        marginBottom: 50,
-        marginLeft: 25,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(255, 255, 255, 0.75)",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 1,
-            height: 3,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.70,
-        elevation: 4,
-    },
-    mainContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-
-    imgBackground: {
-        width: "100%",
-        height: "100%",
-        flex: 1,
-    },
-
-    textInput: {
+    welcome: {
+        marginLeft: 150,
         color: "#B2B1B9",
-        top: 25,
-        height: 60,
-        borderWidth: 1,
-        fontSize: 16,
-        fontWeight: "300",
-        paddingLeft: 45,
-        borderColor: "#777",
-        opacity: .7,
-
-    },
-
-    textInputCont: {
-        flex: 1,
-        width: "80%",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 1,
-            height: 3
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.70,
-        elevation: 4,
-    },
-
-    title: {
-        color: "#343A40",
-        fontSize: 38,
+        fontSize: 24,
         fontWeight: "500",
         shadowColor: "#000",
         shadowOffset: {
@@ -195,83 +118,4 @@ const styles = StyleSheet.create({
         shadowRadius: 2.70,
         elevation: 4,
     },
-
-    colorSelectorCont: {
-        position: "absolute",
-        flex: 1,
-        alignSelf: "center",
-        justifyContent: "center",
-    },
-
-    selectColor: {
-        fontSize: 18,
-        fontWeight: "400",
-        color: "grey",
-        marginLeft: 10,
-    },
-
-    colorSelector: {
-        flexDirection: "row",
-        marginTop: 15,
-    },
-
-    colors: {
-        width: 50,
-        height: 50,
-        margin: 8,
-        marginTop: 0,
-        borderRadius: 50 / 2,
-        borderColor: "#fff",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 1,
-            height: 3
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.70,
-        elevation: 4,
-    },
-    black: {
-        backgroundColor: "#212121",
-    },
-    blue: {
-        backgroundColor: "#3D56B2",
-    },
-    red: {
-        backgroundColor: "#FF0000",
-    },
-    purple: {
-        backgroundColor: "#610094",
-    },
-
-    enterChat: {
-        flex: 1,
-        position: "absolute",
-        bottom: 25,
-        alignSelf: "center",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "black",
-        width: "88%",
-        height: 60,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 1,
-            height: 3
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 2.70,
-        elevation: 4,
-        opacity: 0.9,
-    },
-
-    btnText: {
-        fontSize: 18,
-        fontWeight: "400",
-        color: "#fff",
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 2,
-        textShadowColor: "#000",
-    },
-
 })
