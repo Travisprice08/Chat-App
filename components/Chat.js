@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar, Bubble } from 'react-native-gifted-chat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import {
@@ -19,21 +19,21 @@ require('firebase/firestore');
 export default class Chat extends Component {
     constructor(props) {
         super(props);
-        // this.state = {
-        //     isTyping: false,
-        //     messages: [],
-        //     uid: 0,
-        //     loginText: "Authenticating..",
-        //     user: {
-        //         _id: "",
-        //         name: "",
-        //         avatar: "",
-        //     },
-        //     isConnected: false,
-        //     dotColor: "",
-        //     image: null,
-        //     location: null,
-        // };
+        this.state = {
+            isTyping: false,
+            messages: [],
+            uid: 0,
+            loginText: "Authenticating..",
+            user: {
+                _id: "",
+                name: "",
+                avatar: "",
+            },
+            isConnected: false,
+            dotColor: "",
+            image: null,
+            location: null,
+        };
 
         //Firebase config details
         const firebaseConfig = {
