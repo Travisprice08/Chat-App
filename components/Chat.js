@@ -73,6 +73,7 @@ export default class Chat extends Component {
             if (connection.isConnected) {
                 this.setState({ isConnected: true });
                 console.log('online');
+                this.getMessages();
 
                 // listen for authentication events
                 this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
@@ -104,8 +105,11 @@ export default class Chat extends Component {
     }
 
     componentWillUnmount() {
-        this.authUnsubscribe();
-        this.authUnsubscribe();
+        if (this.state.isConnected == true) {
+
+            this.authUnsubscribe();
+            this.unsubscribe();
+        }
     }
 
     async getMessages() {
@@ -196,7 +200,7 @@ export default class Chat extends Component {
     // }
 
     renderInputToolbar(props) {
-        if (this.state.isConnected == false) {
+        if (this.state.isConnected === false) {
         } else {
             return (
                 <InputToolbar
@@ -233,7 +237,8 @@ export default class Chat extends Component {
                 <Text>{this.state.loggedInText}</Text>
                 <GiftedChat
                     // Change color of chat bubble
-                    // renderBubble={this.renderBubble.bind(this)}
+                    renderBubble={this.renderBubble.bind(this)}
+                    renderInputToolbar={this.renderInputToolbar.bind(this)}
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
                     user={this.state.user}
