@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { GiftedChat, InputToolbar, Bubble } from 'react-native-gifted-chat';
+import { GiftedChat, InputToolbar, Bubble, SystemMessage } from 'react-native-gifted-chat';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
+import CustomActions from './CustomActions';
 import {
     View,
     Text,
@@ -12,6 +13,7 @@ import {
     Alert,
     LogBox,
 } from 'react-native';
+import MapView from 'react-native-maps';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -199,6 +201,19 @@ export default class Chat extends Component {
     //     }));
     // }
 
+    renderSystemMessage(props) {
+        let backgroundColor = this.props.route.params.backgroundColor;
+        if (backgroundColor !== '#FFFFFF') {
+            return (
+                <SystemMessage
+                    {...props}
+                    textStyle={{ color: '#FFFFFF' }}
+                    timeTextStyle={{ color: '#FFFFFF' }}
+                />
+            )
+        }
+    }
+
     renderInputToolbar(props) {
         if (this.state.isConnected === false) {
         } else {
@@ -223,6 +238,32 @@ export default class Chat extends Component {
         )
     }
 
+    renderCustomActions = (props) =>
+        <CustomActions {...props} />
+
+    renderCustomView(props) {
+        const { currentMessage } = props;
+        if (currentMessage.location) {
+            return (
+                <MapView
+                    style={{
+                        width: 150,
+                        height: 100,
+                        borderRadius: 13,
+                        margin: 3
+                    }}
+                    region={{
+                        latitude: currentMessage.location.latitude,
+                        longitude: currentMessage.location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                />
+            );
+        }
+        return null;
+    }
+
     render() {
         // Get name and background color that user selected
         let { backgroundColor } = this.props.route.params;
@@ -236,12 +277,16 @@ export default class Chat extends Component {
                 {/* <Text style={styles.welcome}>Hello, {this.props.route.params.name}!</Text> */}
                 <Text>{this.state.loggedInText}</Text>
                 <GiftedChat
-                    // Change color of chat bubble
+                    renderSystemMessage={this.renderSystemMessage.bind(this)}
                     renderBubble={this.renderBubble.bind(this)}
                     renderInputToolbar={this.renderInputToolbar.bind(this)}
+                    renderActions={this.renderCustomActions}
+                    renderCustomView={this.renderCustomView}
                     messages={this.state.messages}
                     onSend={messages => this.onSend(messages)}
                     user={this.state.user}
+                    isTyping={true}
+                    isConnected={this.state.isConnected}
                 />
                 {Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
                 }
